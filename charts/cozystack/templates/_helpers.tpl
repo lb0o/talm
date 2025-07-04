@@ -56,6 +56,10 @@ machine:
     hostname: {{ include "talm.discovered.hostname" . | quote }}
     nameservers: {{ include "talm.discovered.default_resolvers" . }}
     {{- (include "talm.discovered.physical_links_info" .) | nindent 4 }}
+    {{- if .Values.kubespan }}
+    kubespan:
+      enabled: true
+    {{- end }}
     interfaces:
     {{- $existingInterfacesConfiguration := include "talm.discovered.existing_interfaces_configuration" . }}
     {{- if $existingInterfacesConfiguration }}
@@ -108,7 +112,7 @@ cluster:
   proxy:
     disabled: true
   discovery:
-    enabled: false
+    enabled: {{ if .Values.kubespan }}true{{ else }}false{{ end }}
   etcd:
     advertisedSubnets:
       {{- toYaml .Values.advertisedSubnets | nindent 6 }}
